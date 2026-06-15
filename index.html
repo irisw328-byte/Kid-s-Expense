@@ -38,7 +38,7 @@
         .form-group { margin-bottom: 18px; }
         .label-wrap { margin-bottom: 8px; font-weight: bold; font-size: 16px; }
         
-        input {
+        input[type="text"], input[type="number"], input[type="password"], input[type="date"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -48,6 +48,29 @@
         }
         input::placeholder { color: #aaa; }
         
+        /* Radio Buttons for Categories */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #444;
+        }
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--text-main);
+            margin: 0;
+        }
+
         .btn-group { display: flex; gap: 8px; }
         .btn {
             flex: 1;
@@ -79,6 +102,7 @@
             font-size: 18px;
         }
 
+        /* Summary & Filter Area */
         .summary-card {
             background-color: #f8f9fc;
             border-radius: 15px;
@@ -86,6 +110,30 @@
             margin-top: 25px;
             border: 1px solid #eee;
         }
+        
+        .filter-box {
+            background-color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .filter-row input { padding: 8px; font-size: 14px; }
+        .btn-filter {
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+        }
+
         .summary-title { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
         
         .summary-table {
@@ -97,11 +145,7 @@
         .summary-table td { padding: 12px 2px; border-bottom: 1px solid #eee; font-size: 15px; font-weight: bold; }
         .td-label { text-align: left; font-size: 14px; font-weight: normal; }
         
-        .action-wrap {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
+        .action-wrap { display: flex; justify-content: center; margin-top: 20px; }
         .btn-export {
             background-color: white;
             border: 1.5px solid var(--success);
@@ -125,8 +169,8 @@
         }
         .history-left { display: flex; align-items: center; gap: 8px; }
         .btn-delete { background: none; border: none; color: #ff4d4f; font-size: 20px; cursor: pointer; padding: 0 5px; }
-        .history-desc { font-size: 15px; }
-        .history-price { font-size: 16px; font-weight: bold; }
+        .history-desc { font-size: 14px; color: #333; }
+        .history-price { font-size: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -145,7 +189,19 @@
 
     <div class="form-group">
         <div class="label-wrap">🛒 What did we buy?</div>
-        <input type="text" id="itemName" placeholder="e.g., Pokémon cards, Snacks">
+        <!-- 新增的圓圈預設選項 -->
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="category" value="Toys" checked> Toys ⭕️
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="category" value="Snacks"> Snacks ⭕️
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="category" value="Others"> Others ⭕️
+            </label>
+        </div>
+        <input type="text" id="itemName" placeholder="Details (Optional, e.g., Pokémon)">
     </div>
 
     <div class="form-group">
@@ -169,7 +225,22 @@
     <button class="btn btn-submit" onclick="addExpense()">Add Record</button>
 
     <div class="summary-card">
-        <div class="summary-title">📊 Monthly Summary (<span id="currentMonthStr"></span>)</div>
+        <div class="summary-title">📊 Summary (<span id="summaryPeriod">This Month</span>)</div>
+        
+        <!-- 新增的日期篩選區塊 -->
+        <div class="filter-box">
+            <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">📅 Filter by Date:</div>
+            <div class="filter-row">
+                <input type="date" id="startDate">
+                <span>to</span>
+                <input type="date" id="endDate">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-filter" style="background-color: var(--secondary); color: white;" onclick="applyFilter()">Search</button>
+                <button class="btn-filter" style="background-color: #eee; color: #333;" onclick="resetFilter()">This Month</button>
+            </div>
+        </div>
+
         <table class="summary-table">
             <thead>
                 <tr>
@@ -202,12 +273,12 @@
         </table>
         
         <div class="action-wrap">
-            <button class="btn-export" onclick="exportToExcel()">🟢 Export to Excel (CSV)</button>
+            <button class="btn-export" onclick="exportToExcel()">🟢 Export Filtered Records (CSV)</button>
         </div>
     </div>
 
     <div class="history-list">
-        <div class="history-title">📝 Recent Records</div>
+        <div class="history-title">📝 Displaying Records</div>
         <div id="historyList"></div>
     </div>
 </div>
@@ -215,12 +286,14 @@
 <script>
     let selectedWho = 'Jayden';
     let selectedFund = 'Mom';
-    const CORRECT_PIN = '8855'; // 預設密碼設定為 8855
+    const CORRECT_PIN = '8855'; 
     let expenses = JSON.parse(localStorage.getItem('JsExpensesTracker')) || [];
+    
+    // 控制目前是看「這個月」還是「自訂日期」
+    let filterMode = 'month'; 
+    let currentFilteredExpenses = [];
 
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const today = new Date();
-    document.getElementById('currentMonthStr').innerText = monthNames[today.getMonth()];
 
     function selectBtn(groupId, btnElement, value) {
         const group = document.getElementById(groupId);
@@ -235,12 +308,13 @@
     }
 
     function addExpense() {
-        const name = document.getElementById('itemName').value;
+        const category = document.querySelector('input[name="category"]:checked').value;
+        const details = document.getElementById('itemName').value.trim();
         const price = parseFloat(document.getElementById('itemPrice').value);
         const pin = document.getElementById('pinCode').value;
 
-        if(!name || isNaN(price)) {
-            alert("Oops! Please enter the item and price.");
+        if(isNaN(price)) {
+            alert("Oops! Please enter the amount.");
             return;
         }
 
@@ -249,11 +323,14 @@
             return;
         }
 
+        // 組合項目名稱：如果只有選圓圈就顯示分類，有打字就顯示 "分類 (細節)"
+        const finalItemName = details ? `${category} (${details})` : category;
+
         const newRecord = {
             id: Date.now(),
             date: new Date().toISOString(),
             who: selectedWho,
-            name: name,
+            name: finalItemName,
             price: price,
             fund: selectedFund
         };
@@ -261,7 +338,6 @@
         expenses.push(newRecord);
         localStorage.setItem('JsExpensesTracker', JSON.stringify(expenses));
         
-        // 重置輸入框
         document.getElementById('itemName').value = '';
         document.getElementById('itemPrice').value = '';
         document.getElementById('pinCode').value = ''; 
@@ -280,16 +356,34 @@
         }
     }
 
+    function applyFilter() {
+        const sDate = document.getElementById('startDate').value;
+        const eDate = document.getElementById('endDate').value;
+        if(!sDate || !eDate) {
+            alert("Please select both start and end dates.");
+            return;
+        }
+        filterMode = 'custom';
+        updateUI();
+    }
+
+    function resetFilter() {
+        filterMode = 'month';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        updateUI();
+    }
+
     function exportToExcel() {
-        if (expenses.length === 0) {
-            alert("No records to export!");
+        if (currentFilteredExpenses.length === 0) {
+            alert("No records to export in this range!");
             return;
         }
         
         let csvContent = "\ufeff"; 
         csvContent += "Date,Who,Item,Amount,Paid By\n";
         
-        expenses.forEach(record => {
+        currentFilteredExpenses.forEach(record => {
             let rDate = new Date(record.date);
             let dateStr = `${rDate.getFullYear()}-${(rDate.getMonth()+1).toString().padStart(2, '0')}-${rDate.getDate().toString().padStart(2, '0')}`;
             let cleanName = record.name.replace(/,/g, " ");
@@ -311,26 +405,47 @@
     }
 
     function updateUI() {
-        const currentMonth = new Date().getMonth();
         let stats = {
             'Jayden': { 'Mom': 0, 'Allowance': 0 },
             'Jamie': { 'Mom': 0, 'Allowance': 0 },
             'Both': { 'Mom': 0, 'Allowance': 0 }
         };
 
+        // 依據篩選條件過濾資料
+        if (filterMode === 'month') {
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            currentFilteredExpenses = expenses.filter(r => {
+                let d = new Date(r.date);
+                return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+            });
+            document.getElementById('summaryPeriod').innerText = "This Month";
+        } else {
+            const sDate = new Date(document.getElementById('startDate').value);
+            sDate.setHours(0,0,0,0);
+            const eDate = new Date(document.getElementById('endDate').value);
+            eDate.setHours(23,59,59,999);
+            
+            currentFilteredExpenses = expenses.filter(r => {
+                let d = new Date(r.date);
+                return d >= sDate && d <= eDate;
+            });
+            document.getElementById('summaryPeriod').innerText = "Custom Range";
+        }
+
         let historyHTML = '';
         let count = 0;
 
-        for(let i = expenses.length - 1; i >= 0; i--) {
-            let record = expenses[i];
-            let recordDate = new Date(record.date);
-            
-            if(recordDate.getMonth() === currentMonth) {
-                stats[record.who][record.fund] += record.price;
-            }
+        // 計算報表數字 & 產生歷史紀錄 (顯示篩選範圍內的最新5筆)
+        // 先將過濾後的資料依日期反向排序 (最新的在上面)
+        let sortedExpenses = [...currentFilteredExpenses].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        sortedExpenses.forEach(record => {
+            stats[record.who][record.fund] += record.price;
 
             if(count < 5) {
-                let dateStr = (recordDate.getMonth()+1) + '/' + recordDate.getDate();
+                let rDate = new Date(record.date);
+                let dateStr = (rDate.getMonth()+1) + '/' + rDate.getDate();
                 let fundIcon = record.fund === 'Mom' ? '👩' : '👛';
                 
                 historyHTML += `
@@ -346,9 +461,8 @@
                 `;
                 count++;
             }
-        }
+        });
 
-        // 更新報表數字
         document.getElementById('mom-jayden').innerText = '$' + stats['Jayden']['Mom'];
         document.getElementById('mom-jamie').innerText = '$' + stats['Jamie']['Mom'];
         document.getElementById('mom-both').innerText = '$' + stats['Both']['Mom'];
@@ -361,7 +475,7 @@
         document.getElementById('total-jamie').innerText = '$' + (stats['Jamie']['Mom'] + stats['Jamie']['Allowance']);
         document.getElementById('total-both').innerText = '$' + (stats['Both']['Mom'] + stats['Both']['Allowance']);
 
-        if(historyHTML === '') historyHTML = '<div style="color:#999; text-align:center; padding: 10px;">No records yet!</div>';
+        if(historyHTML === '') historyHTML = '<div style="color:#999; text-align:center; padding: 10px;">No records found.</div>';
         document.getElementById('historyList').innerHTML = historyHTML;
     }
 
