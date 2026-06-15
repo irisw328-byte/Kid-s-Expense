@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids' Expense Tracker</title>
+    <style>
+        :root {
+            --primary: #ff8fa3; 
+            --secondary: #4ea8de; 
+            --bg: #F8F9FA;
+            --text-en: #2b2d42;
+            --text-zh: #8d99ae;
+            --success: #2a9d8f;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .en { font-size: 16px; font-weight: bold; color: var(--text-en); display: block; }
+        .zh { font-size: 12px; font-weight: normal; color: var(--text-zh); display: block; margin-top: 2px; }
+        
+        h2 { text-align: center; margin-top: 0; margin-bottom: 20px; }
+        h2 .en { font-size: 24px; color: #333; }
+        h2 .zh { font-size: 14px; }
+
+        .form-group { margin-bottom: 18px; }
+        .label-wrap { margin-bottom: 8px; }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .btn-group { display: flex; gap: 10px; }
+        .btn {
+            flex: 1;
+            padding: 10px 5px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background-color: #f4f6f8;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .btn .en { color: #555; }
+        .btn .zh { color: #999; }
+
+        .btn.active { border-color: transparent; }
+        .btn.active.boy1 { background-color: var(--secondary); }
+        .btn.active.boy2 { background-color: #ffd166; }
+        .btn.active.mom { background-color: var(--primary); }
+        .btn.active.pocket { background-color: #06d6a0; }
+        
+        .btn.active.boy1 .en, .btn.active.boy1 .zh,
+        .btn.active.mom .en, .btn.active.mom .zh,
+        .btn.active.pocket .en, .btn.active.pocket .zh { color: white; }
+        .btn.active.boy2 .en, .btn.active.boy2 .zh { color: #333; }
+
+        .btn-submit {
+            background-color: var(--text-en);
+            width: 100%;
+            margin-top: 5px;
+            padding: 12px;
+        }
+        .btn-submit .en { color: white; font-size: 18px; }
+        .btn-submit .zh { color: #ccc; }
+
+        .summary-card {
+            background-color: #f8f9fc;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 25px;
+            border: 1px solid #eee;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .summary-table th { padding-bottom: 10px; border-bottom: 2px solid #ddd; }
+        .summary-table td { padding: 12px 5px; border-bottom: 1px solid #eee; font-size: 16px; font-weight: bold; }
+        .td-label { text-align: left; }
+        .td-label .en { font-size: 14px; }
+        
+        .action-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .btn-export {
+            background-color: white;
+            border: 1.5px solid var(--success);
+            border-radius: 10px;
+            padding: 8px 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-export .en { color: var(--success); font-size: 14px; }
+        .btn-export .zh { color: #66b2a6; font-size: 11px; }
+
+        .history-list { margin-top: 25px; }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .history-left { display: flex; align-items: center; gap: 10px; }
+        .btn-delete { background: none; border: none; color: #ff4d4f; font-size: 18px; cursor: pointer; padding: 0 5px; }
+        .history-desc .en { font-size: 15px; }
+        .history-desc .zh { font-size: 12px; }
+        .history-price { font-size: 16px; font-weight: bold; color: var(--text-en); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h2>
+        <span class="en">💰 Expense Tracker</span>
+        <span class="zh">寶貝記帳本</span>
+    </h2>
+    
+    <div class="form-group">
+        <div class="label-wrap">
+            <span class="en">👦 Who is it for?</span>
+            <span class="zh">買給誰？</span>
+        </div>
+        <div class="btn-group" id="whoGroup">
+            <button class="btn boy1 active" onclick="selectBtn('whoGroup', this, 'Older Bro')">
+                <span class="en">Older Bro</span><span class="zh">哥哥</span>
+            </button>
+            <button class="btn boy2" onclick="selectBtn('whoGroup', this, 'Younger Bro')">
+                <span class="en">Younger Bro</span><span class="zh">弟弟</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="label-wrap">
+            <span class="en">🛒 What did we buy?</span>
+            <span class="zh">買了什麼？</span>
+        </div>
+        <input type="text" id="itemName" placeholder="e.g., Pokémon cards">
+    </div>
+
+    <div class="form-group">
+        <div class="label-wrap">
+            <span class="en">💵 How much?</span>
+            <span class="zh">多少錢？</span>
+        </div>
+        <input type="number" id="itemPrice" placeholder="$ Amount">
+    </div>
+
+    <div class="form-group">
+        <div class="label-wrap">
+            <span class="en">💳 Who pays?</span>
+            <span class="zh">誰出錢？</span>
+        </div>
+        <div class="btn-group" id="fundGroup">
+            <button class="btn mom active" onclick="selectBtn('fundGroup', this, 'Mom')">
+                <span class="en">Mom's Treat</span><span class="zh">媽媽付 (同意)</span>
+            </button>
+            <button class="btn pocket" onclick="selectBtn('fundGroup', this, 'Allowance')">
+                <span class="en">My Allowance</span><span class="zh">扣零用錢</span>
+            </button>
+        </div>
+    </div>
+
+    <button class="btn btn-submit" onclick="addExpense()">
+        <span class="en">Add Record</span>
+        <span class="zh">記上一筆</span>
+    </button>
+
+    <div class="summary-card">
+        <div style="text-align: center;">
+            <span class="en" style="font-size: 18px;">📊 Monthly Summary (<span id="currentMonthStr"></span>)</span>
+            <span class="zh">本月結算</span>
+        </div>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th class="td-label"><span class="en">Source</span><span class="zh">來源</span></th>
+                    <th><span class="en">Older Bro</span><span class="zh">哥哥</span></th>
+                    <th><span class="en">Younger Bro</span><span class="zh">弟弟</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="td-label"><span class="en">Mom's Treat</span><span class="zh">媽媽付</span></td>
+                    <td id="mom-boy1">$0</td>
+                    <td id="mom-boy2">$0</td>
+                </tr>
+                <tr>
+                    <td class="td-label"><span class="en">Allowance</span><span class="zh">扣零用錢</span></td>
+                    <td id="pocket-boy1">$0</td>
+                    <td id="pocket-boy2">$0</td>
+                </tr>
+                <tr style="background-color:#e2e8f0; border-radius: 8px;">
+                    <td class="td-label" style="padding-left:5px;"><span class="en">Total</span><span class="zh">本月總額</span></td>
+                    <td id="total-boy1" style="color: #d90429;">$0</td>
+                    <td id="total-boy2" style="color: #d90429;">$0</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="action-wrap">
+            <button class="btn-export" onclick="exportToExcel()">
+                <span class="en">🟢 Export to Excel (CSV)</span>
+                <span class="zh">匯出 Excel 報表</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+</div>
+
+<script>
+    let selectedWho = 'Older Bro';
+    let selectedFund = 'Mom';
+    let expenses = JSON.parse(localStorage.getItem('kidsExpenses_Bilingual')) || [];
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const today = new Date();
+    document.getElementById('currentMonthStr').innerText = monthNames[today.getMonth()];
+
+    function selectBtn(groupId, btnElement, value) {
+        const group = document.getElementById(groupId);
+        const buttons = group.getElementsByTagName('button');
+        for(let btn of buttons) {
+            btn.classList.remove('active');
+        }
+        btnElement.classList.add('active');
+        
+        if(groupId === 'whoGroup') selectedWho = value;
+        if(groupId === 'fundGroup') selectedFund = value;
+    }
+
+    function addExpense() {
+        const name = document.getElementById('itemName').value;
+        const price = parseFloat(document.getElementById('itemPrice').value);
+
+        if(!name || isNaN(price)) {
+            alert("Oops! Please enter the item and price.\n哎呀！請輸入買了什麼跟金額喔。");
+            return;
+        }
+
+        const newRecord = {
+            id: Date.now(),
+            date: new Date().toISOString(),
+            who: selectedWho,
+            name: name,
+            price: price,
+            fund: selectedFund
+        };
+
+        expenses.push(newRecord);
+        localStorage.setItem('kidsExpenses_Bilingual', JSON.stringify(expenses));
+        
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemPrice').value = '';
+        
+        updateUI();
+    }
+
+    function deleteRecord(id) {
+        if(confirm("Delete this record? 確定要刪除這筆紀錄嗎？")) {
+            expenses = expenses.filter(record => record.id !== id);
+            localStorage.setItem('kidsExpenses_Bilingual', JSON.stringify(expenses));
+            updateUI();
+        }
+    }
+
+    function exportToExcel() {
+        if (expenses.length === 0) {
+            alert("No records to export! / 目前沒有任何紀錄可以匯出喔！");
+            return;
+        }
+        
+        let csvContent = "\ufeff"; 
+        csvContent += "Date (日期),Who (買給誰),Item (項目名稱),Amount (金額),Paid By (資金來源)\n";
+        
+        expenses.forEach(record => {
+            let rDate = new Date(record.date);
+            let dateStr = `${rDate.getFullYear()}-${rDate.getMonth()+1}-${rDate.getDate()}`;
+            let whoZh = record.who === 'Older Bro' ? '哥哥' : '弟弟';
+            let fundZh = record.fund === 'Mom' ? "Mom's Treat (媽媽付)" : "My Allowance (扣零用錢)";
+            let cleanName = record.name.replace(/,/g, " ");
+            
+            csvContent += `${dateStr},${record.who} (${whoZh}),${cleanName},${record.price},${fundZh}\n`;
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        
+        const fileDate = `${today.getFullYear()}_${today.getMonth()+1}`;
+        link.setAttribute("download", `Kids_Expenses_${fileDate}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function updateUI() {
+        const currentMonth = new Date().getMonth();
+        let stats = {
+            'Older Bro': { 'Mom': 0, 'Allowance': 0 },
+            'Younger Bro': { 'Mom': 0, 'Allowance': 0 }
+        };
+
+        let historyHTML = '';
+        let count = 0;
+
+        for(let i = expenses.length - 1; i >= 0; i--) {
+            let record = expenses[i];
+            let recordDate = new Date(record.date);
+            
+            if(recordDate.getMonth() === currentMonth) {
+                stats[record.who][record.fund] += record.price;
+            }
+
+            if(count < 5) {
+                let dateStr = (recordDate.getMonth()+1) + '/' + recordDate.getDate();
+                let fundIcon = record.fund === 'Mom' ? '👩' : '👛';
+                let whoZh = record.who === 'Older Bro' ? '哥哥' : '弟弟';
+                
+                historyHTML += `
+                    <div class="history-item">
+                        <div class="history-left">
+                            <button class="btn-delete" onclick="deleteRecord(${record.id})">×</button>
+                            <div class="history-desc">
+                                <span class="en">${dateStr} | ${record.who} - ${record.name}</span>
+                                <span class="zh">${whoZh}</span>
+                            </div>
+                        </div>
+                        <div class="history-right">
+                            <div class="history-price">${fundIcon} $${record.price}</div>
+                        </div>
+                    </div>
+                `;
+                count++;
+            }
+        }
+
+        document.getElementById('mom-boy1').innerText = '$' + stats['Older Bro']['Mom'];
+        document.getElementById('mom-boy2').innerText = '$' + stats['Younger Bro']['Mom'];
+        document.getElementById('pocket-boy1').innerText = '$' + stats['Older Bro']['Allowance'];
+        document.getElementById('pocket-boy2').innerText = '$' + stats['Younger Bro']['Allowance'];
+        
+        document.getElementById('total-boy1').innerText = '$' + (stats['Older Bro']['Mom'] + stats['Older Bro']['Allowance']);
+        document.getElementById('total-boy2').innerText = '$' + (stats['Younger Bro']['Mom'] + stats['Younger Bro']['Allowance']);
+
+        let titleHTML = '<div class="label-wrap"><span class="en" style="font-weight:bold; font-size:16px;">📝 Recent Records</span><span class="zh">最近5筆紀錄</span></div>';
+        if(historyHTML === '') historyHTML = '<div style="color:#999; text-align:center; padding: 20px;"><span class="en">No records yet!</span><span class="zh">目前還沒有紀錄喔</span></div>';
+        document.getElementById('historyList').innerHTML = titleHTML + historyHTML;
+    }
+
+    updateUI();
+</script>
+
+</body>
+</html>
