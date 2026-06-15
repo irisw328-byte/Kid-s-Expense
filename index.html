@@ -5,50 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J's Expenses Tracker</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Quicksand:wght@600;700&display=swap');
+
         :root {
-            --primary: #ff8fa3; 
-            --secondary: #4ea8de; 
-            --boy2-color: #ffd166;
-            --both-color: #b5838d;
-            --teal-light: #83c5be; /* 藍綠色 (未選中) */
-            --teal-dark: #2a9d8f;  /* 藍綠色 (選中) */
-            --bg: #F8F9FA;
-            --text-main: #2b2d42;
-            --success: #2a9d8f;
+            /* 柔和粉彩調色盤 */
+            --bg-color: #FFF9F5;         /* 暖奶油白底色 */
+            --text-main: #5C4B51;        /* 深可可色(取代純黑更柔和) */
+            --text-light: #8C7A80;       /* 淺可可色 */
+            
+            --jayden: #A2D2FF;           /* 粉藍 */
+            --jamie: #FDE26C;            /* 暖陽黃 */
+            --both: #CDB4DB;             /* 柔紫 */
+            
+            --mom: #FFAFCC;              /* 櫻花粉 */
+            --allowance: #B5E48C;        /* 薄荷綠 */
+
+            /* 圓圈分類顏色 */
+            --cat-toys: #FFB7B2;         /* 蠟筆粉紅 */
+            --cat-snacks: #FFDAC1;       /* 奶油橘 */
+            --cat-others: #B5EAD7;       /* 柔和青綠 */
+            
+            --border-soft: #F0E6E6;
         }
+
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Quicksand', 'Nunito', sans-serif;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 15px;
             display: flex;
             justify-content: center;
             color: var(--text-main);
         }
+
         .app-container {
             width: 100%;
             max-width: 450px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            padding: 20px;
+            background: #FFFFFF;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(92, 75, 81, 0.08);
+            padding: 25px;
             box-sizing: border-box;
+            border: 2px solid #FFFDFB;
         }
         
-        h2 { text-align: center; margin-top: 0; margin-bottom: 20px; font-size: 24px; color: #333; }
+        h2 { 
+            text-align: center; 
+            margin-top: 5px; 
+            margin-bottom: 25px; 
+            font-size: 26px; 
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
 
-        .form-group { margin-bottom: 18px; }
-        .label-wrap { margin-bottom: 10px; font-weight: bold; font-size: 16px; }
+        .form-group { margin-bottom: 20px; }
+        .label-wrap { 
+            margin-bottom: 10px; 
+            font-weight: 700; 
+            font-size: 16px; 
+            color: var(--text-main);
+        }
         
         input[type="text"], input[type="number"], input[type="password"], input[type="date"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
+            padding: 14px;
+            border: 2px solid var(--border-soft);
+            border-radius: 14px;
             font-size: 16px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            color: var(--text-main);
             box-sizing: border-box;
+            transition: 0.3s ease;
+            background-color: #FAFAFA;
         }
-        input::placeholder { color: #aaa; }
+        input:focus {
+            outline: none;
+            border-color: var(--mom);
+            background-color: #FFF;
+        }
+        input::placeholder { color: #C4B5B9; font-weight: 600; }
         
         /* 圓圈分類按鈕設計 */
         .category-group {
@@ -58,131 +94,168 @@
             margin-bottom: 15px;
         }
         .btn-circle {
-            width: 75px;
-            height: 75px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: none;
-            background-color: var(--teal-light);
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
+            border: 3px solid transparent;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            opacity: 0.6;
         }
+        
+        .btn-circle.c-toys { background-color: var(--cat-toys); }
+        .btn-circle.c-snacks { background-color: var(--cat-snacks); }
+        .btn-circle.c-others { background-color: var(--cat-others); }
+
         .btn-circle.active {
-            background-color: var(--teal-dark);
-            transform: scale(1.1);
-            box-shadow: 0 4px 10px rgba(42, 157, 143, 0.4);
+            opacity: 1;
+            transform: translateY(-5px) scale(1.08);
+            border-color: #FFF;
+            box-shadow: 0 8px 16px rgba(92, 75, 81, 0.15);
         }
 
-        .btn-group { display: flex; gap: 8px; }
+        /* 橫向選擇按鈕 */
+        .btn-group { display: flex; gap: 10px; }
         .btn {
             flex: 1;
-            padding: 12px 5px;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            background-color: #f4f6f8;
+            padding: 14px 5px;
+            border: 2px solid var(--border-soft);
+            border-radius: 16px;
+            background-color: #FFFFFF;
             cursor: pointer;
             text-align: center;
             font-size: 15px;
-            font-weight: bold;
-            color: #555;
-            transition: 0.2s;
+            font-weight: 800;
+            font-family: 'Quicksand', sans-serif;
+            color: var(--text-light);
+            transition: 0.25s ease;
         }
 
-        .btn.active { border-color: transparent; color: white; }
-        .btn.active.jayden { background-color: var(--secondary); }
-        .btn.active.jamie { background-color: var(--boy2-color); color: #333; }
-        .btn.active.both { background-color: var(--both-color); }
-        .btn.active.mom { background-color: var(--primary); }
-        .btn.active.pocket { background-color: #06d6a0; }
+        .btn.active { border-color: transparent; color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .btn.active.jayden { background-color: var(--jayden); }
+        .btn.active.jamie { background-color: var(--jamie); }
+        .btn.active.both { background-color: var(--both); }
+        .btn.active.mom { background-color: var(--mom); }
+        .btn.active.pocket { background-color: var(--allowance); }
 
+        /* 提交按鈕 */
         .btn-submit {
             background-color: var(--text-main);
             color: white;
             width: 100%;
-            margin-top: 5px;
-            padding: 14px;
+            margin-top: 10px;
+            padding: 16px;
             font-size: 18px;
-            border-radius: 12px;
+            border-radius: 16px;
             border: none;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 800;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 15px rgba(92, 75, 81, 0.2);
+            transition: 0.2s;
         }
+        .btn-submit:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(92, 75, 81, 0.2); }
 
         /* 結算與篩選區 */
         .summary-card {
-            background-color: #f8f9fc;
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 25px;
-            border: 1px solid #eee;
+            background-color: #FFFDFB;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 2px solid var(--border-soft);
         }
         
         .filter-box {
-            background-color: white;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
+            background-color: #FFFFFF;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-soft);
         }
         .filter-row {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: var(--text-light);
         }
-        .filter-row input { padding: 8px; font-size: 14px; }
+        .filter-row input { padding: 10px; font-size: 14px; border-radius: 10px; }
         .btn-filter {
-            padding: 8px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 12px;
             border: none;
-            font-weight: bold;
+            font-weight: 800;
+            font-family: 'Quicksand', sans-serif;
             cursor: pointer;
             flex: 1;
+            transition: 0.2s;
         }
+        .btn-filter.primary { background-color: var(--jayden); color: var(--text-main); }
+        .btn-filter.secondary { background-color: var(--border-soft); color: var(--text-main); }
 
-        .summary-title { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .summary-title { text-align: center; font-size: 18px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); }
         
         .summary-table {
             width: 100%;
             border-collapse: collapse;
             text-align: center;
+            font-family: 'Nunito', sans-serif;
         }
-        .summary-table th { padding-bottom: 10px; border-bottom: 2px solid #ddd; font-size: 14px; }
-        .summary-table td { padding: 12px 2px; border-bottom: 1px solid #eee; font-size: 15px; font-weight: bold; }
-        .td-label { text-align: left; font-size: 14px; font-weight: normal; }
+        .summary-table th { padding-bottom: 12px; border-bottom: 2px dashed var(--border-soft); font-size: 15px; color: var(--text-light); }
+        .summary-table td { padding: 14px 2px; border-bottom: 1px solid #F5F0F0; font-size: 16px; font-weight: 800; }
+        .td-label { text-align: left; font-size: 15px; font-weight: 700; color: var(--text-main); }
         
         .action-wrap { display: flex; justify-content: center; margin-top: 20px; }
         .btn-export {
-            background-color: white;
-            border: 1.5px solid var(--success);
-            border-radius: 10px;
-            padding: 10px 16px;
+            background-color: #FFFFFF;
+            border: 2px solid var(--allowance);
+            border-radius: 14px;
+            padding: 12px 16px;
             cursor: pointer;
             width: 100%;
-            color: var(--success);
+            color: #6D9E44;
             font-size: 15px;
-            font-weight: bold;
+            font-weight: 800;
+            font-family: 'Quicksand', sans-serif;
+            transition: 0.2s;
         }
+        .btn-export:active { background-color: var(--allowance); color: var(--text-main); }
 
-        .history-list { margin-top: 25px; }
-        .history-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+        .history-list { margin-top: 30px; }
+        .history-title { font-weight: 800; font-size: 18px; margin-bottom: 15px; color: var(--text-main); }
         .history-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px dashed #ddd;
+            padding: 15px 0;
+            border-bottom: 2px dashed var(--border-soft);
         }
-        .history-left { display: flex; align-items: center; gap: 8px; }
-        .btn-delete { background: none; border: none; color: #ff4d4f; font-size: 20px; cursor: pointer; padding: 0 5px; }
-        .history-desc { font-size: 14px; color: #333; }
-        .history-price { font-size: 15px; font-weight: bold; }
+        .history-left { display: flex; align-items: center; gap: 10px; }
+        .btn-delete { 
+            background: #FFE3E3; 
+            border: none; 
+            color: #FF6B6B; 
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px; 
+            font-weight: bold;
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .history-desc { font-size: 15px; font-weight: 600; color: var(--text-main); }
+        .history-price { font-size: 17px; font-weight: 800; font-family: 'Nunito', sans-serif;}
     </style>
 </head>
 <body>
@@ -202,9 +275,9 @@
     <div class="form-group">
         <div class="label-wrap">🛒 What did we buy?</div>
         <div class="category-group" id="categoryGroup">
-            <button class="btn-circle active" onclick="selectCategory(this, 'Toys')">TOYS</button>
-            <button class="btn-circle" onclick="selectCategory(this, 'Snacks')">SNACKS</button>
-            <button class="btn-circle" onclick="selectCategory(this, 'Others')">OTHERS</button>
+            <button class="btn-circle c-toys active" onclick="selectCategory(this, 'Toys')">TOYS</button>
+            <button class="btn-circle c-snacks" onclick="selectCategory(this, 'Snacks')">SNACKS</button>
+            <button class="btn-circle c-others" onclick="selectCategory(this, 'Others')">OTHERS</button>
         </div>
         <input type="text" id="itemName" placeholder="Details (Optional, e.g., Pokémon)">
     </div>
@@ -233,15 +306,15 @@
         <div class="summary-title">📊 Summary (<span id="summaryPeriod">This Month</span>)</div>
         
         <div class="filter-box">
-            <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">📅 Filter by Date:</div>
+            <div style="font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">📅 Filter by Date:</div>
             <div class="filter-row">
                 <input type="date" id="startDate">
                 <span>to</span>
                 <input type="date" id="endDate">
             </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-filter" style="background-color: var(--secondary); color: white;" onclick="applyFilter()">Search</button>
-                <button class="btn-filter" style="background-color: #eee; color: #333;" onclick="resetFilter()">This Month</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-filter primary" onclick="applyFilter()">Search</button>
+                <button class="btn-filter secondary" onclick="resetFilter()">This Month</button>
             </div>
         </div>
 
@@ -267,17 +340,17 @@
                     <td id="pocket-jamie">$0</td>
                     <td id="pocket-both">$0</td>
                 </tr>
-                <tr style="background-color:#e2e8f0; border-radius: 8px;">
-                    <td class="td-label" style="padding-left:5px; font-weight:bold;">Total</td>
-                    <td id="total-jayden" style="color: #d90429;">$0</td>
-                    <td id="total-jamie" style="color: #d90429;">$0</td>
-                    <td id="total-both" style="color: #d90429;">$0</td>
+                <tr style="background-color:#FFF5F8; border-radius: 12px;">
+                    <td class="td-label" style="padding-left:8px; font-weight:800; color:#E56B90;">Total</td>
+                    <td id="total-jayden" style="color: #E56B90;">$0</td>
+                    <td id="total-jamie" style="color: #E56B90;">$0</td>
+                    <td id="total-both" style="color: #E56B90;">$0</td>
                 </tr>
             </tbody>
         </table>
         
         <div class="action-wrap">
-            <button class="btn-export" onclick="exportToExcel()">🟢 Export Filtered Records (CSV)</button>
+            <button class="btn-export" onclick="exportToExcel()">📥 Export Filtered Records (CSV)</button>
         </div>
     </div>
 
@@ -289,7 +362,7 @@
 
 <script>
     let selectedWho = 'Jayden';
-    let selectedCategory = 'Toys'; // 預設分類
+    let selectedCategory = 'Toys'; 
     let selectedFund = 'Mom';
     const CORRECT_PIN = '8855'; 
     let expenses = JSON.parse(localStorage.getItem('JsExpensesTracker')) || [];
@@ -299,7 +372,6 @@
 
     const today = new Date();
 
-    // 處理人物與資金按鈕切換
     function selectBtn(groupId, btnElement, value) {
         const group = document.getElementById(groupId);
         const buttons = group.getElementsByTagName('button');
@@ -312,7 +384,6 @@
         if(groupId === 'fundGroup') selectedFund = value;
     }
 
-    // 處理圓圈分類按鈕切換
     function selectCategory(btnElement, value) {
         const group = document.getElementById('categoryGroup');
         const buttons = group.getElementsByTagName('button');
@@ -338,7 +409,6 @@
             return;
         }
 
-        // 如果有打字就顯示 "TOYS (Pokémon)"，沒打字就只顯示 "TOYS"
         const finalItemName = details ? `${selectedCategory} (${details})` : selectedCategory;
 
         const newRecord = {
@@ -465,7 +535,7 @@
                         <div class="history-left">
                             <button class="btn-delete" onclick="deleteRecord(${record.id})">×</button>
                             <div class="history-desc">
-                                ${dateStr} | <b>${record.who}</b> - ${record.name}
+                                ${dateStr} | <b>${record.who}</b> <br> <span style="font-size:13px; color:#8C7A80;">${record.name}</span>
                             </div>
                         </div>
                         <div class="history-price">${fundIcon} $${record.price}</div>
@@ -487,7 +557,7 @@
         document.getElementById('total-jamie').innerText = '$' + (stats['Jamie']['Mom'] + stats['Jamie']['Allowance']);
         document.getElementById('total-both').innerText = '$' + (stats['Both']['Mom'] + stats['Both']['Allowance']);
 
-        if(historyHTML === '') historyHTML = '<div style="color:#999; text-align:center; padding: 10px;">No records found.</div>';
+        if(historyHTML === '') historyHTML = '<div style="color:#C4B5B9; text-align:center; padding: 10px; font-weight:600;">No records found.</div>';
         document.getElementById('historyList').innerHTML = historyHTML;
     }
 
