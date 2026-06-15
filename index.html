@@ -2,15 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J's Expenses Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 讓手機存到桌面時顯示特定的名字 -->
+    <meta name="apple-mobile-web-app-title" content="kids Expense">
+    <meta name="application-name" content="kids Expense">
+    
+    <!-- 讓程式可以像真正的 App 一樣全螢幕執行 (隱藏網址列) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <title>kids Expense</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Quicksand:wght@600;700&display=swap');
 
         :root {
-            /* 柔和粉彩調色盤 */
-            --bg-color: #FFF9F5;         /* 暖奶油白底色 */
-            --text-main: #5C4B51;        /* 深可可色(取代純黑更柔和) */
+            /* 莫蘭迪溫暖調色盤 */
+            --bg-color: #EFE6E1;         /* 溫柔的燕麥奶茶底色 (不再慘白) */
+            --card-bg: #FFFCFA;          /* 暖象牙白卡片底色 */
+            --text-main: #5C4B51;        /* 深可可色 */
             --text-light: #8C7A80;       /* 淺可可色 */
             
             --jayden: #A2D2FF;           /* 粉藍 */
@@ -25,7 +36,7 @@
             --cat-snacks: #FFDAC1;       /* 奶油橘 */
             --cat-others: #B5EAD7;       /* 柔和青綠 */
             
-            --border-soft: #F0E6E6;
+            --border-soft: #E8DCD8;      /* 配合底色調深的柔和邊框 */
         }
 
         body {
@@ -36,14 +47,16 @@
             display: flex;
             justify-content: center;
             color: var(--text-main);
+            /* 防止在 iPhone 上點擊時出現奇怪的灰色反白 */
+            -webkit-tap-highlight-color: transparent; 
         }
 
         .app-container {
             width: 100%;
             max-width: 450px;
-            background: #FFFFFF;
+            background: var(--card-bg);
             border-radius: 28px;
-            box-shadow: 0 10px 30px rgba(92, 75, 81, 0.08);
+            box-shadow: 0 10px 30px rgba(92, 75, 81, 0.1);
             padding: 25px;
             box-sizing: border-box;
             border: 2px solid #FFFDFB;
@@ -53,16 +66,16 @@
             text-align: center; 
             margin-top: 5px; 
             margin-bottom: 25px; 
-            font-size: 26px; 
+            font-size: 28px; 
             font-weight: 800;
             letter-spacing: 0.5px;
         }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 22px; }
         .label-wrap { 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
             font-weight: 700; 
-            font-size: 16px; 
+            font-size: 18px; 
             color: var(--text-main);
         }
         
@@ -71,7 +84,7 @@
             padding: 14px;
             border: 2px solid var(--border-soft);
             border-radius: 14px;
-            font-size: 16px;
+            font-size: 18px; 
             font-family: 'Quicksand', sans-serif;
             font-weight: 600;
             color: var(--text-main);
@@ -94,12 +107,12 @@
             margin-bottom: 15px;
         }
         .btn-circle {
-            width: 80px;
-            height: 80px;
+            width: 85px; 
+            height: 85px;
             border-radius: 50%;
             border: 3px solid transparent;
             font-family: 'Quicksand', sans-serif;
-            font-size: 14px;
+            font-size: 16px; 
             font-weight: 800;
             color: var(--text-main);
             cursor: pointer;
@@ -132,7 +145,7 @@
             background-color: #FFFFFF;
             cursor: pointer;
             text-align: center;
-            font-size: 15px;
+            font-size: 17px; 
             font-weight: 800;
             font-family: 'Quicksand', sans-serif;
             color: var(--text-light);
@@ -153,7 +166,7 @@
             width: 100%;
             margin-top: 10px;
             padding: 16px;
-            font-size: 18px;
+            font-size: 20px; 
             border-radius: 16px;
             border: none;
             cursor: pointer;
@@ -187,12 +200,14 @@
             margin-bottom: 12px;
             font-weight: 700;
             color: var(--text-light);
+            font-size: 16px;
         }
-        .filter-row input { padding: 10px; font-size: 14px; border-radius: 10px; }
+        .filter-row input { padding: 10px; font-size: 16px; border-radius: 10px; } 
         .btn-filter {
-            padding: 10px;
+            padding: 12px;
             border-radius: 12px;
             border: none;
+            font-size: 16px;
             font-weight: 800;
             font-family: 'Quicksand', sans-serif;
             cursor: pointer;
@@ -202,7 +217,7 @@
         .btn-filter.primary { background-color: var(--jayden); color: var(--text-main); }
         .btn-filter.secondary { background-color: var(--border-soft); color: var(--text-main); }
 
-        .summary-title { text-align: center; font-size: 18px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); }
+        .summary-title { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); } 
         
         .summary-table {
             width: 100%;
@@ -210,9 +225,9 @@
             text-align: center;
             font-family: 'Nunito', sans-serif;
         }
-        .summary-table th { padding-bottom: 12px; border-bottom: 2px dashed var(--border-soft); font-size: 15px; color: var(--text-light); }
-        .summary-table td { padding: 14px 2px; border-bottom: 1px solid #F5F0F0; font-size: 16px; font-weight: 800; }
-        .td-label { text-align: left; font-size: 15px; font-weight: 700; color: var(--text-main); }
+        .summary-table th { padding-bottom: 12px; border-bottom: 2px dashed var(--border-soft); font-size: 16px; color: var(--text-light); }
+        .summary-table td { padding: 14px 2px; border-bottom: 1px solid #F5F0F0; font-size: 18px; font-weight: 800; } 
+        .td-label { text-align: left; font-size: 16px; font-weight: 700; color: var(--text-main); }
         
         .action-wrap { display: flex; justify-content: center; margin-top: 20px; }
         .btn-export {
@@ -223,7 +238,7 @@
             cursor: pointer;
             width: 100%;
             color: #6D9E44;
-            font-size: 15px;
+            font-size: 16px; 
             font-weight: 800;
             font-family: 'Quicksand', sans-serif;
             transition: 0.2s;
@@ -231,7 +246,7 @@
         .btn-export:active { background-color: var(--allowance); color: var(--text-main); }
 
         .history-list { margin-top: 30px; }
-        .history-title { font-weight: 800; font-size: 18px; margin-bottom: 15px; color: var(--text-main); }
+        .history-title { font-weight: 800; font-size: 20px; margin-bottom: 15px; color: var(--text-main); } 
         .history-item {
             display: flex;
             justify-content: space-between;
@@ -244,18 +259,18 @@
             background: #FFE3E3; 
             border: none; 
             color: #FF6B6B; 
-            width: 28px;
-            height: 28px;
+            width: 32px; 
+            height: 32px;
             border-radius: 50%;
-            font-size: 16px; 
+            font-size: 18px; 
             font-weight: bold;
             cursor: pointer; 
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .history-desc { font-size: 15px; font-weight: 600; color: var(--text-main); }
-        .history-price { font-size: 17px; font-weight: 800; font-family: 'Nunito', sans-serif;}
+        .history-desc { font-size: 16px; font-weight: 600; color: var(--text-main); } 
+        .history-price { font-size: 18px; font-weight: 800; font-family: 'Nunito', sans-serif;} 
     </style>
 </head>
 <body>
@@ -303,10 +318,10 @@
     <button class="btn btn-submit" onclick="addExpense()">Add Record</button>
 
     <div class="summary-card">
-        <div class="summary-title">📊 Summary (<span id="summaryPeriod">This Month</span>)</div>
+        <div class="summary-title">📊 Summary <span id="summaryPeriod">This Month</span></div>
         
         <div class="filter-box">
-            <div style="font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">📅 Filter by Date:</div>
+            <div style="font-size: 16px; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">📅 Filter by Date:</div>
             <div class="filter-row">
                 <input type="date" id="startDate">
                 <span>to</span>
@@ -535,7 +550,7 @@
                         <div class="history-left">
                             <button class="btn-delete" onclick="deleteRecord(${record.id})">×</button>
                             <div class="history-desc">
-                                ${dateStr} | <b>${record.who}</b> <br> <span style="font-size:13px; color:#8C7A80;">${record.name}</span>
+                                ${dateStr} | <b>${record.who}</b> <br> <span style="font-size:14px; color:#8C7A80;">${record.name}</span>
                             </div>
                         </div>
                         <div class="history-price">${fundIcon} $${record.price}</div>
@@ -557,7 +572,7 @@
         document.getElementById('total-jamie').innerText = '$' + (stats['Jamie']['Mom'] + stats['Jamie']['Allowance']);
         document.getElementById('total-both').innerText = '$' + (stats['Both']['Mom'] + stats['Both']['Allowance']);
 
-        if(historyHTML === '') historyHTML = '<div style="color:#C4B5B9; text-align:center; padding: 10px; font-weight:600;">No records found.</div>';
+        if(historyHTML === '') historyHTML = '<div style="color:#C4B5B9; text-align:center; padding: 10px; font-weight:600; font-size:16px;">No records found.</div>';
         document.getElementById('historyList').innerHTML = historyHTML;
     }
 
